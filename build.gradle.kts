@@ -1,7 +1,16 @@
+buildscript {
+    extra.apply {
+        set("queryDslVersion", "5.0.0")
+    }
+
+   // var querydslversion =rootProject.extra.get("queryDslVersion") as String
+}
+
 plugins {
     java
     id("org.springframework.boot") version "2.7.15"
     id("io.spring.dependency-management") version "1.0.15.RELEASE"
+    id ("com.ewerk.gradle.plugins.querydsl") version "1.0.10"
 }
 
 group = "org.zerock"
@@ -11,10 +20,12 @@ java {
     sourceCompatibility = JavaVersion.VERSION_11
 }
 
+
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
     }
+
 }
 
 repositories {
@@ -37,8 +48,23 @@ dependencies {
 
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0")
 
+    implementation("com.querydsl:querydsl-jpa:${rootProject.extra["queryDslVersion"]}")
+
+    annotationProcessor(
+            "jakarta.persistence:jakarta.persistence-api",
+            "jakarta.annotation:jakarta.annotation-api",
+            "com.querydsl:querydsl-apt:${rootProject.extra["queryDslVersion"]}"
+    )
+
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+
+sourceSets {
+    main {
+        java.srcDirs("$projectDir/src/main/java", "$projectDir/build/generated")
+    }
 }
